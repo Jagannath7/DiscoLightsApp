@@ -2,6 +2,7 @@ package com.example.discolights
 
 
 import android.content.Context
+import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -11,43 +12,50 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.getSystemService
+import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import kotlin.random.Random
 
-class MainActivity : AppCompatActivity() {
 
-    lateinit var  sensorEventListener : SensorEventListener
+class MainActivity : AppCompatActivity() , SensorEventListener{
+
     lateinit var sensorManager: SensorManager
     lateinit var proxSensor: Sensor
+
+    val colors = arrayOf(Color.BLUE,Color.BLACK,Color.CYAN,Color.GREEN,Color.RED,Color.YELLOW,Color.MAGENTA)
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // no action required for now
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if(event!!.values[0]>0){
+            flProxInd.setBackgroundColor(colors[Random.nextInt(7)])
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sensorManager: SensorManager
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val proxSensor: Sensor
         proxSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
 
-        sensorEventListener = object: SensorEventListener{
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-                // no action required for now
-            }
 
-            override fun onSensorChanged(event: SensorEvent?) {
-                Log.d("Prox", """
-                    onSensorChanged: ${event!!.values[0]}
-                """.trimIndent())
-            }
-        }
     }
 
     override fun onResume() {
         super.onResume()
-        sensorManager.registerListener(sensorEventListener, proxSensor, 1000*1000)
+        sensorManager.registerListener(
+            this, proxSensor, 1000*1000
+        )
 
     }
 
     override fun onPause() {
-        sensorManager.unregisterListener(sensorEventListener)
+        sensorManager.unregisterListener(this)
         super.onPause()
     }
 }
+
+
