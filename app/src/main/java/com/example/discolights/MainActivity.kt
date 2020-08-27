@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     lateinit var sensorManager: SensorManager
     lateinit var proxSensor: Sensor
+    lateinit var accelSensor: Sensor
 
     val colors = arrayOf(Color.BLUE,Color.BLACK,Color.CYAN,Color.GREEN,Color.RED,Color.YELLOW,Color.MAGENTA)
 
@@ -29,9 +30,16 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if(event!!.values[0]>0){
-            flProxInd.setBackgroundColor(colors[Random.nextInt(7)])
-        }
+//        if(event!!.values[0]>0){
+//            flProxInd.setBackgroundColor(colors[Random.nextInt(7)])
+//        }
+
+
+        Log.d("ACCEL", """
+            ax = ${event!!.values[0]}
+            ay = ${event!!.values[1]}
+            az = ${event!!.values[2]}
+        """.trimIndent())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,14 +48,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         proxSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
-
+        accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
     }
 
     override fun onResume() {
         super.onResume()
         sensorManager.registerListener(
-            this, proxSensor, 1000*1000
+            this, accelSensor, 1000*1000
         )
 
     }
